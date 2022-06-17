@@ -37,6 +37,8 @@ DOCKERFILE?=./build/$(PRJ_NAME)/Dockerfile
 
 .DEFAULT_GOAL := all
 
+$(BIN):
+	@mkdir -p $@
 
 .PHONY: docker-$(PRJ_NAME)
 docker-$(PRJ_NAME): ; $(info $(M) building docker image...) @ ## Common build docker image
