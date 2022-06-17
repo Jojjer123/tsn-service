@@ -69,7 +69,7 @@ build: $(BIN) ; $(info $(M) building executable...) @ ## Common build program bi
 	$Q CGO_ENABLED=$(CGO_ENABLED) $(GO) build \
 		-tags release \
 		-ldflags '-X $(MODULE)/cmd.version=$(PRJ_VERSION) -X $(MODULE)/cmd.commit=$(VERSION) -X $(MODULE)/cmd.date=$(DATE)' \
-		-o $(BIN)/$(basename $(MODULE)) tsn.go
+		-o $(BIN)/$(basename $(MODULE)) main.go
 
 
 .PHONY: deploy
