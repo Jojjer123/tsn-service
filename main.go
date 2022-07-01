@@ -2,12 +2,20 @@ package main
 
 import (
 	"time"
-	northboundInterface "tsn-service/pkg/northbound"
+	"tsn-service/pkg/logger"
+
+	// northboundInterface "tsn-service/pkg/northbound"
+	server "tsn-service/pkg/notificationServer"
 )
 
-func main() {
+var log = logger.GetLogger()
 
-	northboundInterface.Start()
+func main() {
+	// northboundInterface.Start()
+
+	server.CreateServer("tcp", ":5000")
+
+	log.Info("Back in main now...")
 
 	for {
 		time.Sleep(time.Second * 5)
