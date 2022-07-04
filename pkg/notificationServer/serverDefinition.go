@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"tsn-service/pkg/logger"
-	pb "tsn-service/pkg/structures/grpc/notification"
+	"tsn-service/pkg/structures/notification"
 
 	// "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
@@ -26,13 +26,13 @@ func CreateServer(protocol string, addr string) {
 	// var opts []grpc.ServerOption
 	// opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	s := pb.Server{}
+	s := notification.Server{}
 
 	grpcServer := grpc.NewServer()
 
 	log.Info("Created grpc server!")
 
-	pb.RegisterNotificationServer(grpcServer, &s)
+	notification.RegisterNotificationServer(grpcServer, &s)
 
 	log.Info("Starting to serve...")
 

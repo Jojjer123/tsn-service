@@ -8,7 +8,6 @@ package notification
 
 import (
 	context "context"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotificationClient interface {
-	CalcConfig(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*empty.Empty, error)
+	CalcConfig(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*UUID, error)
 }
 
 type notificationClient struct {
@@ -34,8 +33,8 @@ func NewNotificationClient(cc grpc.ClientConnInterface) NotificationClient {
 	return &notificationClient{cc}
 }
 
-func (c *notificationClient) CalcConfig(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *notificationClient) CalcConfig(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*UUID, error) {
+	out := new(UUID)
 	err := c.cc.Invoke(ctx, "/notification.Notification/CalcConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -47,7 +46,7 @@ func (c *notificationClient) CalcConfig(ctx context.Context, in *empty.Empty, op
 // All implementations must embed UnimplementedNotificationServer
 // for forward compatibility
 type NotificationServer interface {
-	CalcConfig(context.Context, *empty.Empty) (*empty.Empty, error)
+	CalcConfig(context.Context, *UUID) (*UUID, error)
 	mustEmbedUnimplementedNotificationServer()
 }
 
@@ -55,7 +54,7 @@ type NotificationServer interface {
 type UnimplementedNotificationServer struct {
 }
 
-func (UnimplementedNotificationServer) CalcConfig(context.Context, *empty.Empty) (*empty.Empty, error) {
+func (UnimplementedNotificationServer) CalcConfig(context.Context, *UUID) (*UUID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalcConfig not implemented")
 }
 func (UnimplementedNotificationServer) mustEmbedUnimplementedNotificationServer() {}
@@ -72,7 +71,7 @@ func RegisterNotificationServer(s grpc.ServiceRegistrar, srv NotificationServer)
 }
 
 func _Notification_CalcConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
+	in := new(UUID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -84,7 +83,7 @@ func _Notification_CalcConfig_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/notification.Notification/CalcConfig",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServer).CalcConfig(ctx, req.(*empty.Empty))
+		return srv.(NotificationServer).CalcConfig(ctx, req.(*UUID))
 	}
 	return interceptor(ctx, in, info, handler)
 }

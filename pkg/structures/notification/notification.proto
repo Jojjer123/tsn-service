@@ -1,0 +1,12 @@
+syntax = "proto3";
+package notification;
+
+option go_package = "/notification";
+
+message UUID {
+	string value = 1;
+}
+
+service Notification {
+	rpc CalcConfig(UUID) returns (UUID) {}
+}
