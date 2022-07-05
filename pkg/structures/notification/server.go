@@ -1,7 +1,6 @@
 package notification
 
 import (
-	"strings"
 	"tsn-service/pkg/logger"
 	handler "tsn-service/pkg/notification-handler"
 
@@ -14,12 +13,21 @@ type Server struct {
 	UnimplementedNotificationServer
 }
 
-func (s *Server) CalcConfig(ctx context.Context, in *UUID) (*UUID, error) {
-	id := strings.Split(in.GetValue(), "\"")[1] // in.GetValue() is the string: value:"some-uuid"
+func (s *Server) CalcConfig(ctx context.Context, in *IdList) (*UUID, error) {
+	// in.GetValue() is the string: value:"some-uuid"
+	// ids := strings.Split(in.GetValue(), "\"")[1]
 
-	log.Infof("Received notification to calculate configuration for UUID: %s", id)
+	var idStringSlice []string
 
-	configId, err := handler.CalculateConfiguration(id)
+	ids := in.GetValues()
+
+	for _, id := range ids {
+		idStringSlice = append(idStringSlice, id.GetValue())
+	}
+
+	log.Infof("Received notification to calculate configuration for: %s", ids)
+
+	configId, err := handler.CalculateConfiguration(idStringSlice)
 	if err != nil {
 		log.Errorf("Failed calculating configuration: %v", err)
 		return nil, err

@@ -4,9 +4,13 @@ package notification;
 option go_package = "/notification";
 
 message UUID {
-	string value = 1;
+	string Value = 1;
+}
+
+message IdList {
+	repeated UUID Values = 1;
 }
 
 service Notification {
-	rpc CalcConfig(UUID) returns (UUID) {}
+	rpc CalcConfig(IdList) returns (UUID) {}
 }

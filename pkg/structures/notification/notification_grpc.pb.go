@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotificationClient interface {
-	CalcConfig(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*UUID, error)
+	CalcConfig(ctx context.Context, in *IdList, opts ...grpc.CallOption) (*UUID, error)
 }
 
 type notificationClient struct {
@@ -33,7 +33,7 @@ func NewNotificationClient(cc grpc.ClientConnInterface) NotificationClient {
 	return &notificationClient{cc}
 }
 
-func (c *notificationClient) CalcConfig(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*UUID, error) {
+func (c *notificationClient) CalcConfig(ctx context.Context, in *IdList, opts ...grpc.CallOption) (*UUID, error) {
 	out := new(UUID)
 	err := c.cc.Invoke(ctx, "/notification.Notification/CalcConfig", in, out, opts...)
 	if err != nil {
@@ -46,7 +46,7 @@ func (c *notificationClient) CalcConfig(ctx context.Context, in *UUID, opts ...g
 // All implementations must embed UnimplementedNotificationServer
 // for forward compatibility
 type NotificationServer interface {
-	CalcConfig(context.Context, *UUID) (*UUID, error)
+	CalcConfig(context.Context, *IdList) (*UUID, error)
 	mustEmbedUnimplementedNotificationServer()
 }
 
@@ -54,7 +54,7 @@ type NotificationServer interface {
 type UnimplementedNotificationServer struct {
 }
 
-func (UnimplementedNotificationServer) CalcConfig(context.Context, *UUID) (*UUID, error) {
+func (UnimplementedNotificationServer) CalcConfig(context.Context, *IdList) (*UUID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalcConfig not implemented")
 }
 func (UnimplementedNotificationServer) mustEmbedUnimplementedNotificationServer() {}
@@ -71,7 +71,7 @@ func RegisterNotificationServer(s grpc.ServiceRegistrar, srv NotificationServer)
 }
 
 func _Notification_CalcConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UUID)
+	in := new(IdList)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func _Notification_CalcConfig_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/notification.Notification/CalcConfig",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServer).CalcConfig(ctx, req.(*UUID))
+		return srv.(NotificationServer).CalcConfig(ctx, req.(*IdList))
 	}
 	return interceptor(ctx, in, info, handler)
 }

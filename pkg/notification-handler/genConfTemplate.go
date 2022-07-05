@@ -5,8 +5,7 @@ import "tsn-service/pkg/structures/configuration"
 // TODO: Implement correctly with actual values that should be used
 // from the reqData or whatever is required to fill it.
 
-// TODO: Structure doesn't match response.json... FIX IT
-func generateBaseResponse(reqData *configuration.Request) (*configuration.ConfigResponse, error) {
+func genConfigTemplate(reqData []*configuration.Request) (*configuration.ConfigResponse, error) {
 	var baseResp = &configuration.ConfigResponse{
 		Version: 123, // random value for now
 		Responses: []*configuration.Response{

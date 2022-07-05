@@ -5,25 +5,32 @@ import (
 
 	"tsn-service/pkg/logger"
 	store "tsn-service/pkg/store-wrapper"
+	"tsn-service/pkg/structures/configuration"
 
 	"github.com/google/uuid"
 )
 
 var log = logger.GetLogger()
 
-func CalculateConfiguration(id string) (string, error) {
+func CalculateConfiguration(ids []string) (string, error) {
 	// log.Info("Calculating configuration...")
 
+	var allRequestData []*configuration.Request
+
 	// TODO: Get request from k/v store
-	reqData, err := store.GetRequestData(id)
-	if err != nil {
-		return "", err
+	for _, requestId := range ids {
+		reqData, err := store.GetRequestData(requestId)
+		if err != nil {
+			return "", err
+		}
+
+		allRequestData = append(allRequestData, reqData)
 	}
 
 	// log.Info(reqData)
 
 	// TODO: Have template of configuration (response file)
-	resp, err := generateBaseResponse(reqData)
+	config, err := genConfigTemplate(allRequestData)
 	// _, err = generateBaseResponse(reqData)
 	if err != nil {
 		log.Errorf("Failed generating response template: %v", err)
@@ -37,7 +44,7 @@ func CalculateConfiguration(id string) (string, error) {
 	confId := fmt.Sprintf("%v", uuid.New())
 
 	// TODO: Store configuration in k/v store
-	if err = store.StoreConfiguration(resp); err != nil {
+	if err = store.StoreConfiguration(config); err != nil {
 		log.Errorf("Failed storing configurations: %v", err)
 		return "", nil
 	}
