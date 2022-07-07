@@ -27,9 +27,9 @@ func CalculateConfiguration(ids []string) (string, error) {
 		allRequestData = append(allRequestData, reqData)
 	}
 
-	// log.Info(reqData)
+	// TODO: REDO EVERYTHING BELOW THIS COMMENT, CONFIGURATION IS NOT RESPONSE FILE
 
-	// TODO: Have template of configuration (response file)
+	// TODO: Have template of configuration (not response file, response file should only be in UNI or handler of main-service)
 	config, err := genConfigTemplate(allRequestData)
 	// _, err = generateBaseResponse(reqData)
 	if err != nil {
@@ -44,7 +44,7 @@ func CalculateConfiguration(ids []string) (string, error) {
 	confId := fmt.Sprintf("%v", uuid.New())
 
 	// TODO: Store configuration in k/v store
-	if err = store.StoreConfiguration(config); err != nil {
+	if err = store.StoreConfiguration(config, confId); err != nil {
 		log.Errorf("Failed storing configurations: %v", err)
 		return "", nil
 	}

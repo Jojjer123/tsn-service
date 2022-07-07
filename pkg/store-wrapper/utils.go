@@ -16,7 +16,7 @@ func sendToStore(obj []byte, urn string) error {
 	ctx := context.Background()
 
 	// Create a slice of URN elements
-	urnElems := strings.Split(urn, ".")
+	urnElems := strings.SplitN(urn, ".", 2)
 
 	// Get the store
 	store, err := atomix.GetMap(ctx, urnElems[0])

@@ -1,11 +1,9 @@
 package storewrapper
 
 import (
-	"fmt"
 	"tsn-service/pkg/logger"
 	"tsn-service/pkg/structures/configuration"
 
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -27,7 +25,7 @@ func GetRequestData(configId string) (*configuration.Request, error) {
 	return reqData, nil
 }
 
-func StoreConfiguration(req *configuration.ConfigResponse) error {
+func StoreConfiguration(req *configuration.ConfigResponse, confId string) error {
 	// Serialize request
 	obj, err := proto.Marshal(req)
 	if err != nil {
@@ -36,10 +34,12 @@ func StoreConfiguration(req *configuration.ConfigResponse) error {
 	}
 
 	// Create a URN where the serialized request will be stored
-	urn := "configurations.tsn-configuration."
+	urn := "configurations.tsn-configuration." + confId
+
+	log.Infof("Storing config response at: %s", urn)
 
 	// TODO: Generate or use some ID to keep track of the specific stream request
-	urn += fmt.Sprintf("%v", uuid.New())
+	// urn += fmt.Sprintf("%v", uuid.New())
 
 	// Send serialized request to it's specific path in a store
 	err = sendToStore(obj, urn)
