@@ -27,6 +27,21 @@ func CalculateConfiguration(ids []string) (string, error) {
 		allRequestData = append(allRequestData, reqData)
 	}
 
+	// TODO: Get topology
+	// topology, err := store.GetTopology()
+	_, err := store.GetTopology()
+	if err != nil {
+		log.Errorf("Failed getting topology: %v", err)
+		return "", err
+	}
+
+	// TODO: Get current configuration of the network
+	_, err = store.GetConfiguration()
+	if err != nil {
+		log.Errorf("Failed getting configuration: %v", err)
+		return "", err
+	}
+
 	// TODO: REDO EVERYTHING BELOW THIS COMMENT, CONFIGURATION IS NOT RESPONSE FILE
 
 	// TODO: Have template of configuration (not response file, response file should only be in UNI or handler of main-service)
