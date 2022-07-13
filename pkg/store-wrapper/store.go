@@ -100,28 +100,6 @@ func GetTopology() ([]topo.Object, error) {
 	log.Infof("Topo objects: %v", resp.Objects)
 
 	return resp.Objects, nil
-
-	// watchClient, err := client.Watch(ctx, &topo.WatchRequest{Noreplay: false})
-	// if err != nil {
-	// 	log.Fatalf("Failed to watch topo for updates: %v", errors.FromGRPC(err))
-	// 	return
-	// }
-
-	// go func() {
-	// 	for {
-	// 		resp, err := watchClient.Recv()
-	// 		if err == io.EOF {
-	// 			break
-	// 		}
-	// 		if err != nil {
-	// 			log.Warn(err)
-	// 			break
-	// 		}
-	// 		log.Infof("Event: %v", resp.Event)
-	// 	}
-
-	// 	conn.Close()
-	// }()
 }
 
 // TODO: Define topology structure or get from other repo
@@ -144,8 +122,6 @@ func GetConfiguration() (error, error) {
 		return nil, err
 	}
 
-	// defer conn.Close()
-
 	client := diags.CreateChangeServiceClient(conn)
 
 	var req = &diags.ListNetworkChangeRequest{
@@ -159,8 +135,9 @@ func GetConfiguration() (error, error) {
 		return nil, err
 	}
 
-	go func() {
+	log.Infof("Successfully requested network changes from onos-config!")
 
+	go func() {
 		for {
 			resp, err := stream.Recv()
 			if err == io.EOF {
