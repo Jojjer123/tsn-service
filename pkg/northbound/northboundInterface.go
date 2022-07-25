@@ -9,7 +9,7 @@ import (
 var log = logger.GetLogger()
 
 func Start() {
-	// Starts a gNMI servers.
+	// Starts gNMI servers.
 	go startServer(false, ":11161")
 	go startServer(true, ":10161")
 

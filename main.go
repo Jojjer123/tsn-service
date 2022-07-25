@@ -13,7 +13,7 @@ var log = logger.GetLogger()
 func main() {
 	// northboundInterface.Start()
 
-	server.CreateServer("tcp", ":5000")
+	server.CreateServer("tcp", ":5150")
 
 	log.Info("Back in main now...")
 
