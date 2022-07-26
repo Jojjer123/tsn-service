@@ -103,7 +103,7 @@ func GetTopology() ([]topo.Object, error) {
 }
 
 // TODO: Define topology structure or get from other repo
-func GetConfiguration() (error, error) {
+func GetConfiguration() ([]*diags.ListNetworkChangeResponse, error) {
 	ctx := context.Background()
 
 	cert, err := tls.X509KeyPair([]byte(certs.DefaultClientCrt), []byte(certs.DefaultClientKey))
@@ -148,6 +148,7 @@ func GetConfiguration() (error, error) {
 				break
 			}
 			log.Infof("Type: %v", resp.Type)
+
 		}
 
 		conn.Close()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"tsn-service/pkg/logger"
+	"tsn-service/pkg/optimizer"
 	store "tsn-service/pkg/store-wrapper"
 	"tsn-service/pkg/structures/configuration"
 
@@ -29,18 +30,27 @@ func CalculateConfiguration(ids []string) (string, error) {
 
 	// TODO: Get topology
 	// topology, err := store.GetTopology()
-	_, err := store.GetTopology()
+	topology, err := store.GetTopology()
 	if err != nil {
 		log.Errorf("Failed getting topology: %v", err)
 		return "", err
 	}
 
 	// TODO: Get current configuration of the network
-	_, err = store.GetConfiguration()
+	oldConfig, err := store.GetConfiguration()
 	if err != nil {
 		log.Errorf("Failed getting configuration: %v", err)
 		return "", err
 	}
+
+	// TODO: Calculate configuration
+	newConfig, err := optimizer.CalculateConf(topology, oldConfig)
+	if err != nil {
+		log.Errorf("Failed calculating configuration: %v", err)
+		return "", err
+	}
+
+	log.Infof("Config created: %v", newConfig)
 
 	// TODO: Have template of configuration
 

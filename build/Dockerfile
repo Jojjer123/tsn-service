@@ -19,6 +19,7 @@ WORKDIR $HOME
 COPY --from=build /go/bin/main /usr/local/bin/
 
 COPY configs/target_configs target_configs
+COPY configs/schedules schedules
 COPY pkg/certs certs
 
 CMD ["main"]

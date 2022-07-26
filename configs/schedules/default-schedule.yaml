@@ -1,0 +1,7 @@
+gating-cycle: 5 # ms
+isochronous: 15 # percent
+cyclic: 25 # percent
+profile-x: 5 # percent
+user-specific: 5 # percent
+strict-priority-mixed: 25 # percent
+bandwidth-reservation: 10 # percent
