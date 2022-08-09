@@ -38,6 +38,7 @@ require (
 
 require (
 	github.com/atomix/atomix-go-client v0.6.2
+	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gnxi v0.0.0-20220528064112-1ebe7b7e58d3
 	github.com/google/uuid v1.3.0

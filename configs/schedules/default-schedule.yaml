@@ -1,7 +1,17 @@
+# The schedule is read from top to bottom, which means that the first defined traffic class will be active first
+#
+# Available traffic classes are:
+# isochronous
+# cyclic-sync
+# cyclic-async
+# alarms-events
+# config-diag
+# network-control
+# best-effort
+
 gating-cycle: 5 # ms
-isochronous: 15 # percent
-cyclic: 25 # percent
-profile-x: 5 # percent
-user-specific: 5 # percent
-strict-priority-mixed: 25 # percent
-bandwidth-reservation: 10 # percent
+traffic-classes:
+  - name: isochronous
+    assigned-portion: 20 # percent
+  - name: cyclic-async
+    assigned-portion: 15 # percent

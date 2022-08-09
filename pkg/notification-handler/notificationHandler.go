@@ -13,12 +13,12 @@ import (
 
 var log = logger.GetLogger()
 
+// Calculates configuration and stores it as a set request in k/v store, returns ID of configuration set request
 func CalculateConfiguration(ids []string) (string, error) {
-	// log.Info("Calculating configuration...")
-
+	// Not yet used when calculating configuration
 	var allRequestData []*configuration.Request
 
-	// TODO: Get request from k/v store
+	// Get request from k/v store
 	for _, requestId := range ids {
 		reqData, err := store.GetRequestData(requestId)
 		if err != nil {
@@ -28,37 +28,38 @@ func CalculateConfiguration(ids []string) (string, error) {
 		allRequestData = append(allRequestData, reqData)
 	}
 
-	// TODO: Get topology
-	// topology, err := store.GetTopology()
-	topology, err := store.GetTopology()
+	// Get topology
+	topology, err := getTopology()
 	if err != nil {
 		log.Errorf("Failed getting topology: %v", err)
 		return "", err
 	}
 
-	// TODO: Get current configuration of the network
-	oldConfig, err := store.GetConfiguration()
+	// NOT TESTED???
+	// Get current configuration of the network
+	oldConfig, err := getConfiguration()
 	if err != nil {
 		log.Errorf("Failed getting configuration: %v", err)
 		return "", err
 	}
 
-	// TODO: Calculate configuration
+	// Calculate configuration set request
 	newConfig, err := optimizer.CalculateConf(topology, oldConfig)
 	if err != nil {
 		log.Errorf("Failed calculating configuration: %v", err)
 		return "", err
 	}
 
-	log.Infof("Config created: %v", newConfig)
+	// log.Infof("Config set request created: %v", newConfig)
 
-	// TODO: Have template of configuration
-
-	// TODO: Load template with random values (simulate applying configuration)
-
+	// Generate an ID for configuration set request
 	confId := fmt.Sprintf("%v", uuid.New())
 
-	// TODO: Store configuration in k/v store
+	// Store configuration set request in k/v store
+	if err := store.StoreConfiguration(newConfig, confId); err != nil {
+		log.Errorf("Failed storing configuration: %v", err)
+		return "", err
+	}
 
 	return confId, nil
 }
