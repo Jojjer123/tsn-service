@@ -19,7 +19,6 @@ import (
 
 var log = logger.GetLogger()
 
-// var defaultSchedConfigID string
 var defaultSchedID string
 
 // Calculates configuration set request using optimizer, if that failes build configuration set request from default schedule
@@ -54,26 +53,22 @@ func CreateDefaultSchedule() error {
 		return err
 	}
 
-	var defaultSched = &schedule.Schedule{}
-
+	// Convert yaml bytes to json bytes
 	jsonBytes, err := yaml.YAMLToJSON(schedBytes)
 	if err != nil {
 		log.Errorf("Failed converting file content from yaml to json: %v", err)
 		return err
 	}
 
+	var defaultSched = &schedule.Schedule{}
+
+	// Deserialize json bytes to schedule
 	if err = jsonpb.Unmarshal(bytes.NewReader(jsonBytes), defaultSched); err != nil {
 		log.Errorf("Failed unmarshaling json to protobuf: %v", err)
 		return err
 	}
 
-	// // Create config from default schedule
-	// conf, err := createConfigurationFromSchedule(defaultSched)
-	// if err != nil {
-	// 	log.Errorf("Failed creating configuration from schedule: %v", err)
-	// 	return err
-	// }
-
+	// Serialize schedule
 	data, err := proto.Marshal(defaultSched)
 	if err != nil {
 		log.Errorf("Failed marshaling default schedule: %v", err)
@@ -82,14 +77,10 @@ func CreateDefaultSchedule() error {
 
 	// log.Infof("Data to be stored: %v", data)
 
-	// Generate ID for default schedule configuration
-	// defaultSchedConfigID = fmt.Sprintf("%v", uuid.New())
 	// Generate ID for default schedule
 	defaultSchedID = fmt.Sprintf("%v", uuid.New())
 
-	// Store configuration
-	// store.StoreConfiguration(conf, defaultSchedConfigID)
-	// Store schedule
+	// Store schedule in k/v store
 	err = store.StoreSchedule(data, defaultSchedID)
 	if err != nil {
 		log.Errorf("Failed storing default schedule: %v", err)

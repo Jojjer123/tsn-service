@@ -2,6 +2,7 @@ package optimizer
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"tsn-service/pkg/structures/schedule"
 
@@ -9,17 +10,16 @@ import (
 	pb "github.com/openconfig/gnmi/proto/gnmi"
 )
 
+// TODO: Make generic paths for all the updates, they are currently built statically for our switches
+
 // Creates configuration set request from given schedule and network topology
 func createConfigurationFromSchedule(sched *schedule.Schedule, topology []topo.Object) (*pb.SetRequest, error) {
-	var devicePortMap map[string][]string
-
+	// Find all ports on all devices in the topology
 	devicePortMap, err := findAllPortsOnDevices(topology)
 	if err != nil {
 		log.Errorf("Failed finding all ports on devices: %v", err)
 		return nil, err
 	}
-
-	// log.Infof("Map of devices with their ports looks like: %v", devicePortMap)
 
 	req := &pb.SetRequest{}
 
@@ -59,8 +59,6 @@ func createConfigurationFromSchedule(sched *schedule.Schedule, topology []topo.O
 		}
 	}
 
-	// log.Infof("Request looks like: %v", *req)
-
 	return req, nil
 }
 
@@ -86,20 +84,24 @@ func findAllPortsOnDevices(topology []topo.Object) (map[string][]string, error) 
 			}
 
 			var adHocAspect = &topo.AdHoc{}
+
+			// Get ad hoc aspect from topology object
 			if err := topoObj.GetAspect(adHocAspect); err != nil {
 				log.Errorf("Failed getting aspect: %v", err)
 				return nil, err
 			}
 
+			// Check and assign source port if found in ad hoc aspect
 			if srcPort, ok = adHocAspect.Properties["srcPort"]; ok {
 				log.Infof("Source port is: %v", srcPort)
 			}
 
+			// Check and assign destination port if found in ad hoc aspect
 			if dstPort, ok = adHocAspect.Properties["dstPort"]; ok {
 				log.Infof("Destionation port is: %v", dstPort)
 			}
 
-			// Append src device with its port, and dst device with its port
+			// Append src device and dst device with their ports
 			devicePortMap[srcDevice] = append(devicePortMap[srcDevice], srcPort)
 			devicePortMap[dstDevice] = append(devicePortMap[dstDevice], dstPort)
 		}
@@ -110,7 +112,7 @@ func findAllPortsOnDevices(topology []topo.Object) (map[string][]string, error) 
 
 // Cycle time extension is statically 0 now, not sure what to do about it yet
 // Base time is statically 0 on both seconds and fractional seconds now, not sure what to do about it yet
-// Takes in port and device IP, creates updates for admin-cycle-time-extension, admin-base-time, and config-change
+// Create updates for admin-cycle-time-extension, admin-base-time, and config-change
 func getFinalElems(port string, deviceIp string) []*pb.Update {
 	// Build update for admin cycle time extension
 	cycleTimeExtUpd := &pb.Update{
@@ -169,9 +171,14 @@ func getFinalElems(port string, deviceIp string) []*pb.Update {
 			},
 			Target: deviceIp,
 		},
+		// Val: &pb.TypedValue{
+		// 	Value: &pb.TypedValue_UintVal{
+		// 		UintVal: 0, // This should maybe be calculated???
+		// 	},
+		// },
 		Val: &pb.TypedValue{
-			Value: &pb.TypedValue_UintVal{
-				UintVal: 0, // This should maybe be calculated???
+			Value: &pb.TypedValue_StringVal{
+				StringVal: "0", // This should maybe be calculated???
 			},
 		},
 	}
@@ -203,9 +210,14 @@ func getFinalElems(port string, deviceIp string) []*pb.Update {
 			},
 			Target: deviceIp,
 		},
+		// Val: &pb.TypedValue{
+		// 	Value: &pb.TypedValue_UintVal{
+		// 		UintVal: 0, // This should maybe be calculated???
+		// 	},
+		// },
 		Val: &pb.TypedValue{
-			Value: &pb.TypedValue_UintVal{
-				UintVal: 0, // This should maybe be calculated???
+			Value: &pb.TypedValue_StringVal{
+				StringVal: "0", // This should maybe be calculated???
 			},
 		},
 	}
@@ -243,6 +255,7 @@ func getFinalElems(port string, deviceIp string) []*pb.Update {
 	return []*pb.Update{cycleTimeExtUpd, baseTimeSecondsUpd, baseTimeFractionalSecondsUpd, confChangeUpd}
 }
 
+// Create updates for gate-enabled, admin-gate-states, and admin-control-list-length
 func getStatusChangeElems(port string, deviceIp string, numOfTrafficClassEntries int) []*pb.Update {
 	// Build update for gate enabled
 	gateEnabledUpd := &pb.Update{
@@ -337,6 +350,7 @@ func getStatusChangeElems(port string, deviceIp string, numOfTrafficClassEntries
 	return []*pb.Update{gateEnabledUpd, gateStatesUpd, controlListLenUpd}
 }
 
+// Create updates for operation-name, gate-states-value, and time-interval-value, for every traffic class in schedule
 func getGclElems(sched *schedule.Schedule, port string, deviceIp string) []*pb.Update {
 	var updates []*pb.Update
 	// For every traffic class, create an entry in the admin-control-list
@@ -359,7 +373,7 @@ func getGclElems(sched *schedule.Schedule, port string, deviceIp string) []*pb.U
 					},
 					{
 						Name: "admin-control-list",
-						Key:  map[string]string{"index": string(index)},
+						Key:  map[string]string{"index": fmt.Sprint(index)},
 					},
 					{
 						Name: "operation-name",
@@ -370,7 +384,7 @@ func getGclElems(sched *schedule.Schedule, port string, deviceIp string) []*pb.U
 			},
 			Val: &pb.TypedValue{
 				Value: &pb.TypedValue_StringVal{
-					StringVal: "set-gates-states",
+					StringVal: "set-gate-states",
 				},
 			},
 		}
@@ -393,7 +407,7 @@ func getGclElems(sched *schedule.Schedule, port string, deviceIp string) []*pb.U
 					},
 					{
 						Name: "admin-control-list",
-						Key:  map[string]string{"index": string(index)},
+						Key:  map[string]string{"index": fmt.Sprint(index)},
 					},
 					{
 						Name: "sgs-params",
@@ -431,7 +445,7 @@ func getGclElems(sched *schedule.Schedule, port string, deviceIp string) []*pb.U
 					},
 					{
 						Name: "admin-control-list",
-						Key:  map[string]string{"index": string(index)},
+						Key:  map[string]string{"index": fmt.Sprint(index)},
 					},
 					{
 						Name: "sgs-params",
@@ -483,12 +497,12 @@ func getGateStatesValue(trafficClassName string) uint64 {
 	return 0
 }
 
+// Get interval in nanoseconds from scheduled percentage of gatingcycle
 func getInterval(assignedPercentage int32, gatingCycle float32) uint64 {
 	return uint64(gatingCycle * 1000 * (float32(assignedPercentage) / 100))
 }
 
-// TODO: Make generic in the case of path for updates, it is currently statically made for our switches
-// Takes in gating cycle in milliseconds and builds two updates for numerator and denominator
+// Create updates for admin-cycle-time (numerator and denominator)
 func getAdminCycleTimeElems(gatingCycle float32, port string, deviceIp string) []*pb.Update {
 	// Create update element for numerator
 	numeratorUpd := &pb.Update{

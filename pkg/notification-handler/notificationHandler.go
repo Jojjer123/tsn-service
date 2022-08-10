@@ -53,7 +53,7 @@ func CalculateConfiguration(ids []string) (string, error) {
 	// log.Infof("Config set request created: %v", newConfig)
 
 	// Generate an ID for configuration set request
-	confId := fmt.Sprintf("%v", uuid.New())
+	confId := fmt.Sprint(uuid.New())
 
 	// Store configuration set request in k/v store
 	if err := store.StoreConfiguration(newConfig, confId); err != nil {
